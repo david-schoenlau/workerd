@@ -80,6 +80,8 @@ jobs:
         run: |
           cp bazel-bin/src/workerd/server/workerd /tmp/workerd
           /tmp/workerd --version
+          # Without tcmalloc the background-release knob is ignored by design; drop only that assertion.
+          sed -i '/TCMalloc background release enabled/d' .github/executor/smoke-test.sh
           bash .github/executor/smoke-test.sh /tmp/workerd
           # The point of this build: tcmalloc must not be linked in.
           if grep -qa 'TCMalloc assumes' /tmp/workerd; then echo "::error::tcmalloc still linked"; exit 1; fi
